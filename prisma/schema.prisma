@@ -1,0 +1,35 @@
+generator client {
+ provider = "prisma-client-js"
+}
+datasource db {
+ provider = "sqlite"
+ url = env("DATABASE_URL")
+}
+model Agent {
+ id String @id @default(cuid())
+ name String
+ config String
+ remoteId String?
+ published Boolean @default(false)
+ createdAt DateTime @default(now())
+ versions Version[]
+ sessions Session[]
+}
+model Version {
+ id String @id @default(cuid())
+ agentId String
+ agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+ config String
+ createdAt DateTime @default(now())
+}
+model Session {
+ id String @id @default(cuid())
+ agentId String
+ agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+ remoteId String? @unique
+ transcript String
+ analysis String
+ duration Int @default(0)
+ simulated Boolean @default(false)
+ createdAt DateTime @default(now())
+}
