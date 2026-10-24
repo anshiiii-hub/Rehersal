@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Shell } from "./studio";
 import { api } from "./api";
-import { Grade } from "@/lib/schemas";
+import { usePreferences } from "./preferences";
+import PersonalNote from "./personal-note";
 type Session = {
   id: string;
   agent: { name: string };
@@ -13,6 +14,7 @@ type Session = {
   createdAt: string;
 };
 export default function Dashboard() {
+  const { preferences } = usePreferences();
   const [sessions, setSessions] = useState<Session[]>([]),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
@@ -36,12 +38,18 @@ export default function Dashboard() {
     <Shell>
       <div className="heading">
         <div>
-          <div className="eyebrow">THE MOMENTS THAT MAKE A DIFFERENCE</div>
-          <h1>Every conversation, a little better.</h1>
-          <p className="muted">Look back. Find the turning points. Go again.</p>
+          <div className="eyebrow">YOUR PRACTICE JOURNAL</div>
+          <h1 className="journal-title">
+            {preferences.name
+              ? `${preferences.name}, look how far you’ve come.`
+              : "You showed up. That counts."}
+          </h1>
+          <p className="muted">
+            A few things to learn from. A few things to feel good about.
+          </p>
         </div>
         <Link href="/new" className="btn primary">
-          Create an agent ↗
+          Try something new ↗
         </Link>
       </div>
       {error && <div className="notice error">{error}</div>}
@@ -101,31 +109,18 @@ export default function Dashboard() {
             );
           })}
         </div>
-        <div
-          className="panel"
-          style={{ background: "linear-gradient(120deg,#2b223a,#1c1923)" }}
-        >
-          <div className="eyebrow">PRACTICE MAKES PROGRESS</div>
-          <h2>
-            The transcript tells a story.
-            <br />
-            The feedback shows the way.
-          </h2>
-          <p className="muted">
-            Open a role-play session to see evidence-backed scores, missed
-            opportunities, and the next thing to try.
-          </p>
-          <span style={{ color: "#c5a4fa" }}>
-            A better conversation starts with reflection. ↗
-          </span>
-        </div>
+        <PersonalNote
+          storageKey="practice-intention"
+          title="What are you working on?"
+          prompt="Maybe it’s asking better questions. Maybe it’s slowing down. One thing you’d like to try next time…"
+        />
       </div>
       <div className="sectionhead">
-        <h2>Session history</h2>
+        <h2>Your conversations, so far</h2>
         <div className="flex">
           <input
             aria-label="Search sessions"
-            placeholder="Search agents…"
+            placeholder="Find a conversation…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

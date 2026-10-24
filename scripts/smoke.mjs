@@ -28,6 +28,8 @@ try {
     prompt:
       "Create a fictional reluctant patient who hides symptoms for a practice session.",
     language: "en",
+    kind: "roleplay",
+    difficulty: "Brutal",
   });
   assert.equal(created.response.status, 201);
   id = created.data.id;
@@ -36,6 +38,7 @@ try {
   let agent = (await request(`/api/agents/${id}`)).data;
   const old = agent.config;
   assert.equal(old.kind, "roleplay");
+  assert.equal(old.difficulty, "Brutal");
   assert.equal(old.rubric.length, 4);
   const changed = {
     ...old,

@@ -23,13 +23,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     admin(req);
-    const { prompt, language } = z
+    const { prompt, language, difficulty, kind } = z
       .object({
         prompt: z.string().min(10).max(1000),
         language: z.enum(["en", "hi"]).default("en"),
+        difficulty: z.enum(["Friendly", "Tough", "Brutal"]).optional(),
+        kind: z.enum(["assistant", "roleplay"]).optional(),
       })
       .parse(await req.json());
-    const config = await compile(prompt, language);
+    const config = await compile(prompt, language, kind);
+    if (difficulty) config.difficulty = difficulty;
     const remote = process.env.ELEVENLABS_API_KEY
       ? await createAgent(config)
       : null;

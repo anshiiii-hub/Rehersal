@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import PersonalNote from "./personal-note";
 import { Shell } from "./studio";
 import { api } from "./api";
 import { Config, Grade, Turn } from "@/lib/schemas";
@@ -44,7 +45,7 @@ export default function SessionDetail({ id }: { id: string }) {
         </div>
         {max > 0 && (
           <div className="center">
-            <strong style={{ fontSize: 44, color: "#c5a5ff" }}>
+            <strong style={{ fontSize: 44, color: "var(--violet)" }}>
               {score}
               <small style={{ fontSize: 18 }}>/{max}</small>
             </strong>
@@ -69,6 +70,11 @@ export default function SessionDetail({ id }: { id: string }) {
           </p>
         ))}
       </div>
+      <PersonalNote
+        storageKey={id}
+        title="What would you try differently?"
+        prompt="A question you wish you’d asked. A moment you felt good about. Leave yourself a reminder for the next rehearsal…"
+      />
       <div className="split">
         <div className="panel">
           <h3>The conversation, with context</h3>
@@ -89,7 +95,7 @@ export default function SessionDetail({ id }: { id: string }) {
                 </small>
                 <p>{t.message}</p>
                 {hit && (
-                  <small style={{ color: "#9ad0b1" }}>
+                  <small style={{ color: "var(--positive)" }}>
                     ✓ {s.agent.config.rubric.find((r) => r.id === hit.id)?.name}{" "}
                     · +{hit.points}
                   </small>
@@ -109,7 +115,7 @@ export default function SessionDetail({ id }: { id: string }) {
                     key={item.id}
                     style={{
                       padding: "18px 0",
-                      borderBottom: "1px solid #302b38",
+                      borderBottom: "1px solid var(--line)",
                     }}
                   >
                     <div
@@ -120,7 +126,9 @@ export default function SessionDetail({ id }: { id: string }) {
                       <span
                         style={{
                           color:
-                            item.status === "missed" ? "#f1a492" : "#a8d5b4",
+                            item.status === "missed"
+                              ? "var(--negative)"
+                              : "var(--positive)",
                         }}
                       >
                         {item.points}/{r?.points}
@@ -141,7 +149,7 @@ export default function SessionDetail({ id }: { id: string }) {
             <h3>Three things to take into the next conversation</h3>
             {s.analysis.top_improvements.map((x, i) => (
               <p key={i}>
-                <span style={{ color: "#be9dfa" }}>
+                <span style={{ color: "var(--violet)" }}>
                   {String(i + 1).padStart(2, "0")}{" "}
                 </span>
                 {x}

@@ -248,7 +248,7 @@ export default function Workspace({
               </span>
               <Link
                 href={`/agents/${id}/edit`}
-                style={{ marginLeft: "auto", color: "#b99aff" }}
+                style={{ marginLeft: "auto", color: "var(--violet)" }}
               >
                 Fine-tune your character ↗
               </Link>
@@ -294,7 +294,10 @@ export default function Workspace({
                         <pre className="code" style={{ color: "#e3a095" }}>
                           {JSON.stringify(config[k], null, 2)}
                         </pre>
-                        <pre className="code" style={{ color: "#9ed4af" }}>
+                        <pre
+                          className="code"
+                          style={{ color: "var(--positive)" }}
+                        >
                           {JSON.stringify(patch.config[k], null, 2)}
                         </pre>
                       </div>
@@ -323,7 +326,7 @@ export default function Workspace({
                   key={v.id}
                   style={{
                     padding: "12px 0",
-                    borderBottom: "1px solid #302b38",
+                    borderBottom: "1px solid var(--line)",
                     justifyContent: "space-between",
                   }}
                 >
@@ -428,7 +431,7 @@ export default function Workspace({
                   </div>
                 ))}
               </div>
-              <hr style={{ borderColor: "#302b38", margin: "24px 0" }} />
+              <hr style={{ borderColor: "var(--line)", margin: "24px 0" }} />
               <h3>Or design an original voice</h3>
               <p>
                 <small>

@@ -48,11 +48,17 @@ export const starters = [
     kind: "assistant",
   },
 ];
-export function template(prompt: string, index = 0): Config {
+export function template(
+  prompt: string,
+  index = 0,
+  kind?: "assistant" | "roleplay",
+): Config {
   const landlord = /landlord|deposit/i.test(prompt),
     exam = /exam|viva/i.test(prompt),
     reception = /dental|appointment/i.test(prompt),
-    role = !reception && !/support|lead|payment/i.test(prompt);
+    role = kind
+      ? kind === "roleplay"
+      : !reception && !/support|lead|payment/i.test(prompt);
   return {
     name: landlord
       ? "Mr. Mehta · The landlord"

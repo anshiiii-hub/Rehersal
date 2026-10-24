@@ -1,6 +1,6 @@
 # Rehearsal
 
-A local hackathon voice-agent studio: **write → test → refine → deploy → observe**. Next.js App Router, strict TypeScript, Tailwind, Prisma/SQLite, Zod, Anthropic and ElevenLabs. Violet, coral and amber, with a rehearsal-stage feel.
+A local hackathon voice-agent studio: **write → test → refine → deploy → observe**. Next.js App Router, strict TypeScript, Tailwind, Prisma/SQLite, Zod, Anthropic and ElevenLabs. A personal rehearsal notebook with warm paper, forest green, and an optional evening theme.
 
 ## Run
 
@@ -19,6 +19,10 @@ npm run dev
 Open http://localhost:3000. For the shorthand seed command, run `npm run seed`; it loads `.env.local` through Node. `npm test`, `npm run typecheck` and `npm run build` verify the app. With the offline dev server running, `npm run test:smoke` exercises the five-stage flow with disposable records and cleans them up. `npm start` serves the production build.
 
 Without keys, the compiler uses explicitly disclosed local starter templates, seed creates local agents, a scripted text rehearsal is available, and one labeled graded demo fixture is included. No browser speech synthesis substitutes for ElevenLabs. Set both keys for the full live flow. To activate an existing offline agent after adding ElevenLabs, open Refine and save it; this creates its remote agent.
+
+## Personal touches
+
+Use the profile button to set your name, studio name and daylight/evening theme. These preferences, unfinished builder drafts, and reflection notes are stored only in this browser. The builder includes scenario choices, a live character summary, challenge settings that are saved into the generated configuration, and contextual writing help. The practice console offers optional opening ideas; the journal and session pages let you keep private reflection notes.
 
 ## Configuration
 

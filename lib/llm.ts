@@ -46,16 +46,17 @@ async function json<T>(
 export async function compile(
   prompt: string,
   language: "en" | "hi",
+  kind?: "assistant" | "roleplay",
 ): Promise<Config> {
   if (!process.env.ANTHROPIC_API_KEY) {
-    const c = template(prompt);
+    const c = template(prompt, 0, kind);
     c.languages = language === "hi" ? ["hi", "en"] : c.languages;
     return c;
   }
   return json(
     configSchema,
     `You compile safe fictional voice agents. ${shape}`,
-    JSON.stringify({ prompt, language }),
+    JSON.stringify({ prompt, language, kind }),
   );
 }
 export async function refine(c: Config, instruction: string) {

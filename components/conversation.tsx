@@ -24,7 +24,8 @@ function ConversationInner({
     [input, setInput] = useState(""),
     [demo, setDemo] = useState(false),
     [latency, setLatency] = useState<number | null>(null),
-    [level, setLevel] = useState(0);
+    [level, setLevel] = useState(0),
+    [cue, setCue] = useState(0);
   const start = useRef(0),
     lastUser = useRef(0),
     first = useRef(false),
@@ -147,6 +148,23 @@ function ConversationInner({
     setInput("");
     duration.current = Math.round((Date.now() - start.current) / 1000);
   }
+  const cues = /landlord/i.test(name)
+    ? [
+        "I’d like to understand your concerns about the deposit.",
+        "Could we go through the specific costs together?",
+        "What would a fair next step look like to you?",
+      ]
+    : /examiner/i.test(name)
+      ? [
+          "Let me explain my starting assumption.",
+          "Could I clarify what you mean before I answer?",
+          "Here’s how I’d test whether that holds up.",
+        ]
+      : [
+          "There’s no rush. Tell me what’s been on your mind.",
+          "When did you first notice that?",
+          "What would feel like a useful next step for you?",
+        ];
   return (
     <div className="split">
       <div className="panel center">
@@ -191,8 +209,30 @@ function ConversationInner({
             ? conversation.isSpeaking
               ? "Speaking · you can interrupt"
               : "Listening · take your time"
-            : "Your next conversation is one click away."}
+            : "No perfect opening needed. Just start with hello."}
         </p>
+        {!started && (
+          <div className="conversation-cue">
+            <span className="handwritten">if you need a way in…</span>
+            <div
+              className="cue-tabs"
+              role="group"
+              aria-label="Conversation opening ideas"
+            >
+              {["Start gently", "Get curious", "Look ahead"].map((label, i) => (
+                <button
+                  key={label}
+                  aria-pressed={cue === i}
+                  className={cue === i ? "selected" : ""}
+                  onClick={() => setCue(i)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p>“{cues[cue]}”</p>
+          </div>
+        )}
         <div className="flex" style={{ justifyContent: "center" }}>
           {started ? (
             <button className="btn" onClick={end}>
@@ -222,7 +262,7 @@ function ConversationInner({
             Try the scripted text demo
           </button>
         )}
-        <p style={{ fontSize: 11, color: "#81798d" }}>
+        <p style={{ fontSize: 11, color: "var(--muted)" }}>
           You’re speaking with an AI. Transcripts are stored when you save a
           session. Avoid personal or sensitive information.
         </p>
@@ -243,8 +283,8 @@ function ConversationInner({
           {turns.length === 0 ? (
             <div className="empty">
               <AudioLines style={{ margin: "20px auto", opacity: 0.4 }} />
-              <p>The conversation unfolds here.</p>
-              <small>Make space for a little discovery.</small>
+              <p>A place for both sides of the conversation.</p>
+              <small>Nothing to get right yet. Take your time.</small>
             </div>
           ) : (
             turns.map((t, i) => (

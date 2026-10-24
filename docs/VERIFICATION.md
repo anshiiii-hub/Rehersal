@@ -11,3 +11,10 @@
 - Four seed agents and one illustrative graded transcript created locally. Seed is idempotent by agent name and can activate an existing offline seed when ElevenLabs credentials are later added.
 
 Not verified: paid/credential-dependent API execution (ElevenLabs create/update/delete, signed live microphone call, TTS, Scribe, Voice Design, authoritative conversation import) or Claude compilation/refinement/grading. Server wrappers follow the linked current docs, but account permissions, models, voice IDs and API behavior must be checked with real credentials before a live judging demo. No real phone calls are made.
+
+## Frontend personalization update
+
+- Redesigned as a warm rehearsal notebook with daylight/evening themes.
+- Browser-checked profile editing, personalized greeting, theme switching, scenario-to-brief selection, challenge-to-preview updates, draft restoration after reload, assistant-specific starters, and saving a private journal note. Temporary QA names/notes were cleared.
+- Challenge and agent-kind choices are checked by the journey smoke test against the persisted configuration.
+- Production build, strict TypeScript and the schema tests pass after the frontend update.
