@@ -54,7 +54,7 @@ function payload(c: Config) {
           temperature: 0.6,
         },
       },
-      tts: { voice_id: c.voice_id, model_id: "eleven_flash_v2_5" },
+      tts: { voice_id: c.voice_id, model_id: "eleven_flash_v2" },
       turn: {
         turn_timeout: 7,
         silence_end_call_timeout: 30,

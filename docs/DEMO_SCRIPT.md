@@ -14,6 +14,7 @@ Before presenting, populate `.env.local`, push the schema, run `npm run seed`, a
 
 **2:45–3:00 · Close.** “A place to practice the conversations you can’t afford to get wrong.” Show receptionist, landlord and viva examiner. End with a student practice link.
 
+
 ## No-key demo
 
 State “offline demo” at the start. Create from a starter, use the labeled scripted text console, edit the form, restore a version, publish the offline practice page, and review the labeled seeded transcript. Voice, AI chat refinement and real grading require credentials. A public offline link cannot talk until the teacher adds ElevenLabs and saves the agent.

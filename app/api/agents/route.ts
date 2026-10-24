@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { admin, failure } from "@/lib/http";
-import { compile } from "@/lib/llm";
+import { compile, hasLlm } from "@/lib/llm";
 import { createAgent } from "@/lib/elevenlabs";
 export async function GET(req: NextRequest) {
   try {
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       agents: agents.map((a) => ({ ...a, config: JSON.parse(a.config) })),
       live: !!process.env.ELEVENLABS_API_KEY,
-      llm: !!process.env.ANTHROPIC_API_KEY,
+      llm: hasLlm(),
     });
   } catch (e) {
     return failure(e);
