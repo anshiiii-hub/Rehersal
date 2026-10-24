@@ -1,3 +1,87 @@
-import {NextRequest,NextResponse} from 'next/server';import {z} from 'zod';import {db} from '@/lib/db';import {admin,failure} from '@/lib/http';import {getConversation} from '@/lib/elevenlabs';import {grade} from '@/lib/llm';import {configSchema,turnSchema} from '@/lib/schemas';
-export async function GET(req:NextRequest){try{admin(req);return NextResponse.json(await db.session.findMany({orderBy:{createdAt:'desc'},include:{agent:{select:{name:true}}}}));}catch(e){return failure(e)}}
-export async function POST(req:NextRequest){try{const body=z.object({agentId:z.string(),remoteId:z.string().optional(),transcript:z.array(turnSchema).max(500).optional(),duration:z.number().int().min(0).max(3600).default(0),simulated:z.boolean().default(false)}).parse(await req.json());const a=await db.agent.findUniqueOrThrow({where:{id:body.agentId}});if(!a.published)admin(req);let transcript=body.transcript||[],duration=body.duration,provider=null;if(body.remoteId){if(!a.remoteId)throw new Error('Agent has no live connection.');const remote=await getConversation(body.remoteId);if(remote.agent_id!==a.remoteId)throw new Error('Conversation does not belong to this agent.');if(remote.status!=='done')return NextResponse.json({error:'Conversation is still processing. Retry saving in a few seconds.'},{status:409});transcript=remote.transcript.filter(t=>t.message).map(t=>({role:t.role,message:t.message!}));duration=remote.metadata?.call_duration_secs||duration;provider=remote.analysis;const existing=await db.session.findUnique({where:{remoteId:body.remoteId}});if(existing)return NextResponse.json(existing);}else {admin(req);if(!body.simulated)throw new Error('Real sessions require a verified ElevenLabs conversation ID.');}if(!transcript.length)throw new Error('There are no conversation turns to save.');const analysis=await grade(configSchema.parse(JSON.parse(a.config)),transcript);const s=await db.session.create({data:{agentId:a.id,remoteId:body.remoteId,transcript:JSON.stringify(transcript),duration,simulated:body.simulated,analysis:JSON.stringify({...analysis,provider})}});return NextResponse.json({id:s.id});}catch(e){return failure(e)}}
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { admin, failure } from "@/lib/http";
+import { getConversation } from "@/lib/elevenlabs";
+import { grade } from "@/lib/llm";
+import { configSchema, turnSchema } from "@/lib/schemas";
+export async function GET(req: NextRequest) {
+  try {
+    admin(req);
+    return NextResponse.json(
+      await db.session.findMany({
+        orderBy: { createdAt: "desc" },
+        include: { agent: { select: { name: true } } },
+      }),
+    );
+  } catch (e) {
+    return failure(e);
+  }
+}
+export async function POST(req: NextRequest) {
+  try {
+    const body = z
+      .object({
+        agentId: z.string(),
+        remoteId: z.string().optional(),
+        transcript: z.array(turnSchema).max(500).optional(),
+        duration: z.number().int().min(0).max(3600).default(0),
+        simulated: z.boolean().default(false),
+      })
+      .parse(await req.json());
+    const a = await db.agent.findUniqueOrThrow({ where: { id: body.agentId } });
+    if (!a.published) admin(req);
+    let transcript = body.transcript || [],
+      duration = body.duration,
+      provider = null;
+    if (body.remoteId) {
+      if (!a.remoteId) throw new Error("Agent has no live connection.");
+      const remote = await getConversation(body.remoteId);
+      if (remote.agent_id !== a.remoteId)
+        throw new Error("Conversation does not belong to this agent.");
+      if (remote.status !== "done")
+        return NextResponse.json(
+          {
+            error:
+              "Conversation is still processing. Retry saving in a few seconds.",
+          },
+          { status: 409 },
+        );
+      transcript = remote.transcript
+        .filter((t) => t.message)
+        .map((t) => ({ role: t.role, message: t.message! }));
+      duration = remote.metadata?.call_duration_secs || duration;
+      provider = remote.analysis;
+      const existing = await db.session.findUnique({
+        where: { remoteId: body.remoteId },
+      });
+      if (existing) return NextResponse.json(existing);
+    } else {
+      admin(req);
+      if (!body.simulated)
+        throw new Error(
+          "Real sessions require a verified ElevenLabs conversation ID.",
+        );
+    }
+    if (!transcript.length)
+      throw new Error("There are no conversation turns to save.");
+    const analysis = await grade(
+      configSchema.parse(JSON.parse(a.config)),
+      transcript,
+    );
+    const s = await db.session.create({
+      data: {
+        agentId: a.id,
+        config: a.config,
+        remoteId: body.remoteId,
+        transcript: JSON.stringify(transcript),
+        duration,
+        simulated: body.simulated,
+        analysis: JSON.stringify({ ...analysis, provider }),
+      },
+    });
+    return NextResponse.json({ id: s.id });
+  } catch (e) {
+    return failure(e);
+  }
+}

@@ -1,10 +1,105 @@
-import {z} from 'zod';
-export const rubricItem=z.object({id:z.string(),name:z.string(),points:z.number().int().min(1).max(100),evidence_hint:z.string()});
-export const configSchema=z.object({name:z.string().min(1).max(80),kind:z.enum(['assistant','roleplay']),persona:z.string().min(10),goals:z.array(z.string()).min(1),conversation_flow:z.array(z.object({step:z.string(),condition:z.string()})).min(1),welcome_message:z.string().min(1),guardrails:z.array(z.string()),languages:z.array(z.enum(['en','hi'])).min(1),voice_suggestion:z.string(),voice_id:z.string(),tools:z.array(z.string()),hidden_goals:z.array(z.string()),secrets:z.array(z.object({secret:z.string(),reveal_condition:z.string()})),emotional_arc:z.string(),difficulty:z.enum(['Friendly','Tough','Brutal']),rubric:z.array(rubricItem).max(6)}).superRefine((c,ctx)=>{if(c.kind==='roleplay'&&c.rubric.length<4)ctx.addIssue({code:'custom',message:'Role-play needs 4–6 rubric items',path:['rubric']});});
-export type Config=z.infer<typeof configSchema>;
-export const patchSchema=z.object({config:configSchema,explanation:z.string()});
-export const turnSchema=z.object({role:z.enum(['user','agent']),message:z.string().max(10000)});
-export type Turn=z.infer<typeof turnSchema>;
-export const gradeSchema=z.object({summary:z.string(),outcome:z.enum(['success','partial','needs-practice']),sentiment:z.string(),flagged_issues:z.array(z.string()),items:z.array(z.object({id:z.string(),status:z.enum(['hit','partial','missed']),points:z.number().min(0),evidence:z.string().nullable(),turn_index:z.number().int().min(0).nullable()})),missed_moments:z.array(z.string()),secrets_uncovered:z.array(z.string()),top_improvements:z.array(z.string()).max(3)});
-export type Grade=z.infer<typeof gradeSchema>;
-export function validateEvidence(g:Grade,c:Config,t:Turn[]):Grade {return {...g,items:c.rubric.map(r=>{const item=g.items.find(i=>i.id===r.id);if(!item||item.turn_index===null||!item.evidence||t[item.turn_index]?.role!=='user'||!t[item.turn_index]?.message.includes(item.evidence))return {id:r.id,status:'missed' as const,points:0,evidence:null,turn_index:null};return {...item,points:Math.min(item.points,r.points)};})};}
+import { z } from "zod";
+export const rubricItem = z.object({
+  id: z.string(),
+  name: z.string(),
+  points: z.number().int().min(1).max(100),
+  evidence_hint: z.string(),
+});
+export const configSchema = z
+  .object({
+    name: z.string().min(1).max(80),
+    kind: z.enum(["assistant", "roleplay"]),
+    persona: z.string().min(10),
+    goals: z.array(z.string()).min(1),
+    conversation_flow: z
+      .array(z.object({ step: z.string(), condition: z.string() }))
+      .min(1),
+    welcome_message: z.string().min(1),
+    guardrails: z.array(z.string()),
+    languages: z.array(z.enum(["en", "hi"])).min(1),
+    voice_suggestion: z.string(),
+    voice_id: z.string(),
+    tools: z.array(z.string()),
+    hidden_goals: z.array(z.string()),
+    secrets: z.array(
+      z.object({ secret: z.string(), reveal_condition: z.string() }),
+    ),
+    emotional_arc: z.string(),
+    difficulty: z.enum(["Friendly", "Tough", "Brutal"]),
+    rubric: z.array(rubricItem).max(6),
+  })
+  .superRefine((c, ctx) => {
+    if (c.rubric.length && c.rubric.reduce((n, r) => n + r.points, 0) !== 100)
+      ctx.addIssue({
+        code: "custom",
+        message: "Rubric points must sum to 100",
+        path: ["rubric"],
+      });
+    if (new Set(c.rubric.map((r) => r.id)).size !== c.rubric.length)
+      ctx.addIssue({
+        code: "custom",
+        message: "Rubric IDs must be unique",
+        path: ["rubric"],
+      });
+    if (c.kind === "roleplay" && c.rubric.length < 4)
+      ctx.addIssue({
+        code: "custom",
+        message: "Role-play needs 4–6 rubric items",
+        path: ["rubric"],
+      });
+  });
+export type Config = z.infer<typeof configSchema>;
+export const patchSchema = z.object({
+  config: configSchema,
+  explanation: z.string(),
+});
+export const turnSchema = z.object({
+  role: z.enum(["user", "agent"]),
+  message: z.string().max(10000),
+});
+export type Turn = z.infer<typeof turnSchema>;
+export const gradeSchema = z.object({
+  summary: z.string(),
+  outcome: z.enum(["success", "partial", "needs-practice"]),
+  sentiment: z.string(),
+  flagged_issues: z.array(z.string()),
+  items: z.array(
+    z.object({
+      id: z.string(),
+      status: z.enum(["hit", "partial", "missed"]),
+      points: z.number().min(0),
+      evidence: z.string().nullable(),
+      turn_index: z.number().int().min(0).nullable(),
+    }),
+  ),
+  missed_moments: z.array(z.string()),
+  secrets_uncovered: z.array(z.string()),
+  top_improvements: z.array(z.string()).max(3),
+});
+export type Grade = z.infer<typeof gradeSchema>;
+export function validateEvidence(g: Grade, c: Config, t: Turn[]): Grade {
+  return {
+    ...g,
+    items: c.rubric.map((r) => {
+      const item = g.items.find((i) => i.id === r.id);
+      if (
+        !item ||
+        item.turn_index === null ||
+        !item.evidence ||
+        t[item.turn_index]?.role !== "user" ||
+        !t[item.turn_index]?.message.includes(item.evidence)
+      )
+        return {
+          id: r.id,
+          status: "missed" as const,
+          points: 0,
+          evidence: null,
+          turn_index: null,
+        };
+      return {
+        ...item,
+        points: item.status === "missed" ? 0 : Math.min(item.points, r.points),
+      };
+    }),
+  };
+}

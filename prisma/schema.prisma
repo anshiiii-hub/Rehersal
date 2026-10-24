@@ -27,6 +27,7 @@ model Session {
  agentId String
  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
  remoteId String? @unique
+ config String @default("{}")
  transcript String
  analysis String
  duration Int @default(0)
