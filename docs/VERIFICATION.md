@@ -18,3 +18,7 @@ Not verified: paid/credential-dependent API execution (ElevenLabs create/update/
 - Browser-checked profile editing, personalized greeting, theme switching, scenario-to-brief selection, challenge-to-preview updates, draft restoration after reload, assistant-specific starters, and saving a private journal note. Temporary QA names/notes were cleared.
 - Challenge and agent-kind choices are checked by the journey smoke test against the persisted configuration.
 - Production build, strict TypeScript and the schema tests pass after the frontend update.
+
+## Playful frontend revision
+
+Replaced the notebook layout with colorful SVG character cards and brief copy. Removed the side preview and repeated explanatory sections. Challenge controls and writing help now live in a collapsed Fine-tune panel. Card selection fills and focuses the prompt; reduced-motion preferences disable animation.

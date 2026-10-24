@@ -100,7 +100,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span className="avatar">{initial}</span>
           <span className="workspace-copy">
             {preferences.workspace}
-            <small>Your space to try things</small>
+            <small>Personal workspace</small>
           </span>
           <ChevronDown size={14} />
         </button>
@@ -111,11 +111,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
             className={path === "/" || path === "/new" ? "active" : ""}
           >
             <Plus size={18} />
-            Make something new
+            Create new
           </Link>
           <Link href="/agents" className={path === "/agents" ? "active" : ""}>
             <LayoutGrid size={17} />
-            Your characters
+            My characters
           </Link>
           <Link
             href="/dashboard"
@@ -126,22 +126,23 @@ export function Shell({ children }: { children: React.ReactNode }) {
             }
           >
             <ChartNoAxesCombined size={17} />
-            Practice journal
+            Activity
           </Link>
           <Link href="/guide" className={path === "/guide" ? "active" : ""}>
-            <BookOpen size={17} />A little guidance
+            <BookOpen size={17} />
+            Quick start
           </Link>
         </nav>
         <div className="sidebottom">
           <div className="tip">
-            <span className="handwritten">a note to self</span>
+            <span className="handwritten">GOOD TO KNOW</span>
             <p>
-              You don’t need the perfect words.
+              Try. Tweak. Try again.
               <br />
-              Just a place to start.
+              That’s the whole idea.
             </p>
             <Link href="/new">
-              Try a conversation <ArrowUpRight size={13} />
+              Meet your next character <ArrowUpRight size={13} />
             </Link>
           </div>
           <button
@@ -165,11 +166,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <button className="profile" onClick={openSettings}>
             <span className="avatar">{initial}</span>
             <span>
-              {preferences.name || "Make this space yours"}
+              {preferences.name || "Your profile"}
               <small>
-                {preferences.name
-                  ? "Your personal studio"
-                  : "Add your name & preferences"}
+                {preferences.name ? "Your personal studio" : "Make it yours"}
               </small>
             </span>
             <Settings2 size={15} />
@@ -182,13 +181,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
             {preferences.workspace}
             <span>/</span>
             {path === "/dashboard"
-              ? "Practice journal"
+              ? "Activity"
               : path.startsWith("/sessions/")
                 ? "A moment to reflect"
                 : path.startsWith("/agents/")
                   ? "Character workshop"
                   : path === "/agents"
-                    ? "Your characters"
+                    ? "My characters"
                     : path === "/guide"
                       ? "Getting started"
                       : "A fresh page"}
@@ -225,10 +224,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <X size={20} />
             </button>
             <span className="eyebrow">A SPACE THAT FEELS LIKE YOU</span>
-            <h2 id="personalize-title">Pull up a chair.</h2>
-            <p className="muted">
-              A few small touches to make this studio your own.
-            </p>
+            <h2 id="personalize-title">Make it yours.</h2>
+            <p className="muted">Your name. Your studio. Your style.</p>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -271,7 +268,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                     })
                   }
                 >
-                  <option value="paper">Daylight · warm paper</option>
+                  <option value="paper">Light · lavender</option>
                   <option value="night">Evening · soft charcoal</option>
                 </select>
               </label>
@@ -349,7 +346,7 @@ export default function Studio() {
             : "Tough",
         );
         setSelected(
-          Number.isInteger(d.selected) && d.selected >= 0 && d.selected < 6
+          Number.isInteger(d.selected) && d.selected >= -1 && d.selected < 6
             ? d.selected
             : null,
         );
@@ -470,441 +467,342 @@ export default function Studio() {
     }
   }
   const listing = path === "/agents";
-  const scenarioIcons = [
-    GraduationCap,
-    MessageCircle,
-    CalendarDays,
-    Headphones,
-    Handshake,
-    Wallet,
-  ];
-  const scenarioNotes = [
-    "A patient with something to hide",
-    "A first hello that opens doors",
-    "A receptionist with a warm welcome",
-    "Someone who makes things simpler",
-    "A landlord who won’t budge",
-    "A sensitive conversation, handled well",
-  ];
-  const visibleStarters = starters
-    .map((s, i) => ({ ...s, index: i }))
-    .filter((s) => s.kind === mode);
+  const cards =
+    mode === "roleplay"
+      ? [
+          {
+            i: 0,
+            name: "The secretive patient",
+            tag: "Ask the right questions",
+            color: "peach",
+            face: 0,
+          },
+          {
+            i: 4,
+            name: "The stubborn landlord",
+            tag: "Find your negotiating voice",
+            color: "lilac",
+            face: 1,
+          },
+          {
+            i: -1,
+            name: "The viva examiner",
+            tag: "Think on your feet",
+            color: "mint",
+            face: 2,
+          },
+        ]
+      : [
+          {
+            i: 2,
+            name: "The receptionist",
+            tag: "A friendly first hello",
+            color: "peach",
+            face: 0,
+          },
+          {
+            i: 3,
+            name: "The problem solver",
+            tag: "Make someone’s day easier",
+            color: "lilac",
+            face: 1,
+          },
+          {
+            i: 1,
+            name: "The connector",
+            tag: "Turn interest into a lead",
+            color: "mint",
+            face: 2,
+          },
+          {
+            i: 5,
+            name: "The gentle reminder",
+            tag: "Handle payment conversations",
+            color: "peach",
+            face: 0,
+          },
+        ];
   return (
     <Shell>
-      <div className="studio-heading">
+      <div className="play-heading">
         <div>
-          <div className="date-note">
-            <span className="little-sun">✳</span>
+          <p className="hello-note">
             {preferences.name
-              ? `Good to see you, ${preferences.name}.`
-              : "Come in. Make yourself comfortable."}
-          </div>
+              ? `Hey ${preferences.name} 👋`
+              : "YOUR VOICE. YOUR RULES."}
+          </p>
           <h1>
             {listing ? (
               <>
-                People to meet.
-                <br />
-                <em>Conversations to try.</em>
+                Meet your <span>crew.</span>
               </>
             ) : (
               <>
-                Big conversations.
+                Big personalities.
                 <br />
-                <em>A little rehearsal first.</em>
+                <span>Zero pressure.</span>
               </>
             )}
           </h1>
-          <p className="intro-copy">
+          <p>
             {listing
-              ? "Pick up where you left off, or make room for someone new."
-              : "For the words you wish you’d said. And the ones you’re about to.\nBuild a voice character, try a conversation, find your footing."}
+              ? "Pick a character. Pick up the conversation."
+              : "Make a voice character. Talk it out. Try again."}
           </p>
         </div>
-        <div className="notebook-sketch" aria-hidden="true">
-          <div className="sketch-bubble one">Can we try that again?</div>
-          <div className="sketch-bubble two">Of course. Take your time.</div>
-          <span className="sketch-star">✳</span>
-          <span className="handwritten">that’s what this space is for ↗</span>
+        <div className="hero-sticker" aria-hidden="true">
+          <AudioLines size={35} />
+          <span>
+            LET’S
+            <br />
+            TALK!
+          </span>
+          <i>✦</i>
         </div>
       </div>
-      {!preferences.name && (
-        <button
-          className="personal-nudge"
-          onClick={() =>
-            document.querySelector<HTMLButtonElement>(".top-profile")?.click()
-          }
-        >
-          This can be your corner of the internet.{" "}
-          <span>
-            Add your name <ArrowUpRight size={13} />
-          </span>
-        </button>
-      )}
       {error && (
         <div className="notice error" role="alert">
           {error}
-          <button aria-label="Dismiss error" onClick={() => setError("")}>
-            <X size={15} />
+          <button onClick={() => setError("")} aria-label="Dismiss error">
+            <X size={16} />
           </button>
         </div>
       )}
       {!listing && (
         <>
-          <div className="workbench">
-            <section className="brief-editor" aria-label="Build your character">
-              <div className="section-kicker">
-                <span className="number-stamp">01</span> WHAT WOULD YOU LIKE TO
-                TRY?
-                <span className="draft-status" aria-live="polite">
-                  {savedDraft ? (
-                    <>
-                      <Check size={12} />
-                      Draft saved
-                    </>
-                  ) : (
-                    "Your first draft"
-                  )}
-                </span>
-              </div>
-              <div
-                className="mode-switch"
-                role="group"
-                aria-label="Type of voice agent"
+          <div
+            className="play-mode"
+            role="group"
+            aria-label="Type of voice agent"
+          >
+            <button
+              aria-pressed={mode === "roleplay"}
+              className={mode === "roleplay" ? "selected" : ""}
+              onClick={() => {
+                setMode("roleplay");
+                setSelected(null);
+              }}
+            >
+              <GraduationCap size={17} />
+              Practice partners
+            </button>
+            <button
+              aria-pressed={mode === "assistant"}
+              className={mode === "assistant" ? "selected" : ""}
+              onClick={() => {
+                setMode("assistant");
+                setSelected(null);
+              }}
+            >
+              <Headphones size={17} />
+              Helpful assistants
+            </button>
+          </div>
+          <div className="cast-heading">
+            <h2>Pick a personality</h2>
+            <small>Or dream up your own below ↓</small>
+          </div>
+          <div className="cast-grid">
+            {cards.map((c) => (
+              <button
+                key={c.name}
+                className={`cast-card ${c.color} ${selected === c.i ? "picked" : ""}`}
+                aria-pressed={selected === c.i}
+                onClick={() => {
+                  if (c.i < 0) {
+                    setSelected(-1);
+                    setPrompt(
+                      "Create a strict viva examiner who challenges assumptions and asks follow-up questions.",
+                    );
+                    promptRef.current?.focus();
+                  } else choose(c.i);
+                }}
               >
-                <button
-                  aria-pressed={mode === "roleplay"}
-                  className={mode === "roleplay" ? "selected" : ""}
-                  onClick={() => {
-                    setMode("roleplay");
-                    setSelected(null);
-                  }}
-                >
-                  <GraduationCap size={17} />
-                  Practice a conversation
-                  <small>A character who challenges you</small>
-                </button>
-                <button
-                  aria-pressed={mode === "assistant"}
-                  className={mode === "assistant" ? "selected" : ""}
-                  onClick={() => {
-                    setMode("assistant");
-                    setSelected(null);
-                  }}
-                >
-                  <Headphones size={17} />
-                  Build a helpful assistant
-                  <small>A voice that gets things done</small>
-                </button>
-              </div>
-              <div className="brief-label">
-                <label htmlFor="character-brief">
+                <div className="cast-top">
+                  <span className="cast-tag">
+                    {c.i === 0
+                      ? "A LITTLE MYSTERY"
+                      : c.i === 4
+                        ? "HARD TO CONVINCE"
+                        : c.i === -1
+                          ? "NO EASY QUESTIONS"
+                          : "HERE TO HELP"}
+                  </span>
+                  <span className="cast-plus">
+                    {selected === c.i ? (
+                      <Check size={17} />
+                    ) : (
+                      <Plus size={17} />
+                    )}
+                  </span>
+                </div>
+                <CharacterFace variant={c.face} />
+                <div className="cast-bottom">
+                  <div>
+                    <h3>{c.name}</h3>
+                    <p>{c.tag}</p>
+                  </div>
+                  <ArrowUpRight size={20} />
+                </div>
+              </button>
+            ))}
+          </div>
+          <section
+            className="prompt-studio"
+            aria-label="Create a voice character"
+          >
+            <div className="prompt-heading">
+              <div>
+                <span className="mini-spark">✦</span>
+                <h2>
                   {selected !== null
-                    ? `Your take on ${starters[selected].title.toLowerCase()}`
-                    : "Tell us who you have in mind."}
-                </label>
+                    ? "Make it yours."
+                    : "Got someone else in mind?"}
+                </h2>
+              </div>
+              <span className="draft-status" aria-live="polite">
+                {savedDraft ? (
+                  <>
+                    <Check size={12} />
+                    Draft saved
+                  </>
+                ) : (
+                  "Start with an idea"
+                )}
+              </span>
+            </div>
+            <label className="sr-only" htmlFor="character-brief">
+              Describe your character
+            </label>
+            <textarea
+              id="character-brief"
+              ref={promptRef}
+              maxLength={1000}
+              rows={3}
+              value={prompt}
+              onChange={(e) => {
+                setPrompt(e.target.value);
+                setHint("");
+              }}
+              placeholder={
+                mode === "roleplay"
+                  ? "A patient who’s hiding something. A landlord who won’t budge. Who would you like to talk to?"
+                  : "A receptionist for my dental clinic who speaks English and Hindi…"
+              }
+            />
+            <div className="prompt-tools">
+              <div className="flex">
                 <button
+                  className={`mic-button ${recording ? "recording" : ""}`}
+                  aria-label={
+                    recording ? "Stop recording" : "Dictate description"
+                  }
+                  onClick={mic}
+                >
+                  {recording ? <Square size={15} /> : <Mic size={16} />}
+                  <span>{recording ? "Listening…" : "Use your voice"}</span>
+                </button>
+                <select
+                  aria-label="Agent language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                >
+                  <option value="en">English</option>
+                  <option value="hi">हिन्दी</option>
+                </select>
+              </div>
+              <small>{prompt.length}/1000</small>
+            </div>
+            <details className="tune-options">
+              <summary>
+                <SlidersHorizontal size={14} />
+                Fine-tune <ChevronDown size={13} />
+              </summary>
+              <div className="tune-body">
+                {mode === "roleplay" && (
+                  <div className="challenge-row">
+                    <b>Challenge level</b>
+                    <div
+                      className="challenge-switch"
+                      role="group"
+                      aria-label="Challenge level"
+                    >
+                      {(["Friendly", "Tough", "Brutal"] as const).map((d) => (
+                        <button
+                          key={d}
+                          aria-pressed={difficulty === d}
+                          className={difficulty === d ? "selected" : ""}
+                          onClick={() => setDifficulty(d)}
+                        >
+                          {d === "Friendly"
+                            ? "Easygoing"
+                            : d === "Tough"
+                              ? "Push me"
+                              : "Bring it on"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <button
+                  className="text-button"
                   onClick={() => setShowTips(!showTips)}
                   aria-expanded={showTips}
-                  className="text-button"
                 >
-                  {showTips ? "Hide a little help" : "Need a little help?"}{" "}
-                  <ChevronDown size={13} />
+                  {showTips ? "Hide writing tips" : "Help me write a brief"}
                 </button>
-              </div>
-              {showTips && (
-                <div className="writing-tips">
-                  <b>Think of three things:</b>
-                  <span>
-                    Who are they? What’s the situation? What should a good
-                    conversation achieve?
-                  </span>
-                  <span>
-                    For example: “A patient who’s nervous about opening up. Help
-                    me practice asking the right questions.”
-                  </span>
-                </div>
-              )}
-              <textarea
-                id="character-brief"
-                ref={promptRef}
-                maxLength={1000}
-                value={prompt}
-                onChange={(e) => {
-                  setPrompt(e.target.value);
-                  setHint("");
-                }}
-                placeholder={
-                  mode === "roleplay"
-                    ? "“A patient who says everything is fine… but isn’t. I want to practice getting them to open up.”"
-                    : "“A friendly receptionist for my dental clinic. Help callers find a good appointment time, in English or Hindi.”"
-                }
-                rows={5}
-              />
-              <div className="writing-meta">
-                <span aria-live="polite">
-                  {recording
-                    ? "Listening. Say it in your own words…"
-                    : hint ||
-                      "Messy ideas welcome. You can fine-tune everything later."}
-                </span>
-                <span>{prompt.length}/1000</span>
-              </div>
-              <div className="brief-options">
-                <div className="flex">
-                  <button
-                    className={`mic-button ${recording ? "recording" : ""}`}
-                    aria-label={
-                      recording ? "Stop recording" : "Dictate description"
-                    }
-                    onClick={mic}
-                  >
-                    {recording ? <Square size={14} /> : <Mic size={15} />}
-                    <span>
-                      {recording ? "Stop recording" : "Say it instead"}
-                    </span>
-                  </button>
-                  <select
-                    aria-label="Agent language"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <option value="en">English</option>
-                    <option value="hi">हिन्दी · Hindi</option>
-                  </select>
-                </div>
+                {showTips && (
+                  <p className="writing-tips">
+                    Who are they? What do they want? What would you like to
+                    practice? That’s enough to start.
+                  </p>
+                )}
                 {prompt && (
                   <button className="text-button" onClick={reset}>
                     <RotateCcw size={12} />
-                    Start fresh
+                    Clear draft
                   </button>
                 )}
               </div>
-              {mode === "roleplay" && (
-                <div className="challenge-row">
-                  <div>
-                    <b>A little push, or a real challenge?</b>
-                    <small>You’re in charge of how tough this gets.</small>
-                  </div>
-                  <div
-                    className="challenge-switch"
-                    role="group"
-                    aria-label="Challenge level"
-                  >
-                    {(["Friendly", "Tough", "Brutal"] as const).map((d) => (
-                      <button
-                        key={d}
-                        aria-pressed={difficulty === d}
-                        className={difficulty === d ? "selected" : ""}
-                        onClick={() => setDifficulty(d)}
-                      >
-                        {d === "Friendly"
-                          ? "Gentle"
-                          : d === "Tough"
-                            ? "Stretch me"
-                            : "Bring it on"}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="create-row">
-                <span>
-                  <LockKeyhole size={12} />
-                  Private until you choose to share.
-                </span>
-                <button
-                  className="btn primary create-button"
-                  disabled={busy || prompt.trim().length < 10}
-                  onClick={create}
-                >
-                  {busy ? (
-                    <>
-                      <span className="loading-dot" />
-                      Setting the scene…
-                    </>
-                  ) : (
-                    <>
-                      Let’s meet your{" "}
-                      {mode === "roleplay" ? "character" : "assistant"}
-                      <ArrowRight size={17} />
-                    </>
-                  )}
-                </button>
-              </div>
-              {!live && !loading && (
-                <div className="demo-note">
-                  <span className="status-dot" />
-                  <span>
-                    You’re in the demo studio. Create and explore freely; live
-                    voice needs a connected ElevenLabs account.
-                  </span>
-                  <Link href="/guide">How it works ↗</Link>
-                </div>
-              )}
-            </section>
-            <aside className="brief-preview">
-              <span className="handwritten">
-                a peek at your next conversation
+            </details>
+            <div className="launch-row">
+              <span>
+                <LockKeyhole size={12} />
+                Only you can see this.
               </span>
-              <div className={`character-portrait portrait-${selected ?? 0}`}>
-                <span>
-                  {mode === "assistant" ? (
-                    <Headphones size={45} strokeWidth={1} />
-                  ) : (
-                    <MessageCircle size={45} strokeWidth={1} />
-                  )}
-                </span>
-                <i className="portrait-spark">✳</i>
-              </div>
-              <span className="preview-type">
-                {mode === "roleplay"
-                  ? "YOUR PRACTICE PARTNER"
-                  : "YOUR NEXT TEAMMATE"}
-              </span>
-              <h2>
-                {selected !== null
-                  ? [
-                      "The reluctant patient",
-                      "The first hello",
-                      "The friendly receptionist",
-                      "The patient problem-solver",
-                      "The stubborn landlord",
-                      "The thoughtful reminder",
-                    ][selected]
-                  : mode === "roleplay"
-                    ? "A character with\na point of view."
-                    : "A helpful voice,\nwith a human touch."}
-              </h2>
-              <p>
-                {selected !== null
-                  ? scenarioNotes[selected]
-                  : mode === "roleplay"
-                    ? "Someone to practice with, before it’s the real thing. No awkwardness. No pressure to get it right."
-                    : "A little less waiting. A little more care. Start with the way you’d want to be spoken to."}
-              </p>
-              <div className="preview-detail">
-                <span>Language</span>
-                <b>{language === "hi" ? "Hindi + English" : "English"}</b>
-              </div>
-              <div className="preview-detail">
-                <span>{mode === "roleplay" ? "The energy" : "The role"}</span>
-                <b>
-                  {mode === "roleplay"
-                    ? difficulty === "Friendly"
-                      ? "Patient & encouraging"
-                      : difficulty === "Tough"
-                        ? "A healthy challenge"
-                        : "Keeps you on your toes"
-                    : "Here to help"}
-                </b>
-              </div>
-              <div className="preview-checklist">
-                <span>
-                  <CheckCircle2 size={14} />A voice you can talk to
-                </span>
-                <span>
-                  <CheckCircle2 size={14} />
-                  {mode === "roleplay"
-                    ? "Private character notes & scoring"
-                    : "Clear goals & conversation steps"}
-                </span>
-                <span>
-                  <CheckCircle2 size={14} />
-                  Room to change your mind
-                </span>
-              </div>
-              <div className="preview-note">
-                <PencilLine size={16} />
-                <span>
-                  {prompt.length >= 10
-                    ? "Your brief is ready for a first take."
-                    : "A sentence or two is enough to start."}
-                </span>
-              </div>
-            </aside>
-          </div>
-          <div className="sectionhead scenario-heading">
-            <div>
-              <span className="eyebrow">BORROW AN IDEA</span>
-              <h2>Sometimes a starting point helps.</h2>
-            </div>
-            <span className="muted">Pick one. Give it your own spin.</span>
-          </div>
-          <div className="scenario-grid">
-            {visibleStarters.map((s) => {
-              const Icon = scenarioIcons[s.index];
-              return (
-                <button
-                  key={s.title}
-                  className={`scenario-card ${selected === s.index ? "chosen" : ""}`}
-                  aria-pressed={selected === s.index}
-                  onClick={() => choose(s.index)}
-                >
-                  <div className={`scenario-icon scenario-icon-${s.index}`}>
-                    <Icon size={23} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3>
-                      {s.title === "Role-play Trainer"
-                        ? "The reluctant patient"
-                        : s.title === "Negotiation"
-                          ? "The stubborn landlord"
-                          : s.title}
-                    </h3>
-                    <p>{scenarioNotes[s.index]}</p>
-                  </div>
-                  <span className="scenario-arrow">
-                    {selected === s.index ? (
-                      <Check size={17} />
-                    ) : (
-                      <ArrowUpRight size={17} />
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-            {mode === "roleplay" && (
               <button
-                className="scenario-card"
-                onClick={() => {
-                  setSelected(null);
-                  setPrompt(
-                    "Create a strict viva examiner who challenges assumptions and asks follow-up questions.",
-                  );
-                  setDifficulty("Tough");
-                  setHint(
-                    "Make it your subject: add what you’re preparing for.",
-                  );
-                  promptRef.current?.focus();
-                }}
+                className="btn primary create-button"
+                disabled={busy || prompt.trim().length < 10}
+                onClick={create}
               >
-                <div className="scenario-icon scenario-icon-3">
-                  <BookOpen size={23} strokeWidth={1.5} />
-                </div>
-                <div>
-                  <h3>The viva examiner</h3>
-                  <p>“Interesting. Now tell me why.”</p>
-                </div>
-                <ArrowUpRight size={17} />
+                {busy ? (
+                  <>
+                    <span className="loading-dot" />
+                    Creating…
+                  </>
+                ) : (
+                  <>
+                    Bring them to life
+                    <ArrowRight size={18} />
+                  </>
+                )}
               </button>
+            </div>
+            {!live && !loading && (
+              <p className="demo-note">
+                <span className="status-dot" />
+                Demo mode · Live voice needs an ElevenLabs connection.
+                <Link href="/guide">Setup ↗</Link>
+              </p>
             )}
-          </div>
+          </section>
         </>
       )}
       <div className="sectionhead recent-heading">
-        <div>
-          <span className="eyebrow">
-            {listing ? "YOUR PEOPLE" : "PICK UP WHERE YOU LEFT OFF"}
-          </span>
-          <h2>
-            {listing
-              ? "Your characters & assistants"
-              : "Still here when you need them."}
-          </h2>
-        </div>
+        <h2>{listing ? "My characters" : "Back for another round?"}</h2>
         {!listing && (
-          <Link className="text-button" href="/agents">
-            Visit your characters <ArrowRight size={14} />
+          <Link href="/agents" className="text-button">
+            See everyone <ArrowRight size={15} />
           </Link>
         )}
       </div>
@@ -914,7 +812,7 @@ export default function Studio() {
             <Search size={17} />
             <input
               aria-label="Search agents"
-              placeholder="Find someone by name…"
+              placeholder="Find a character…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -926,13 +824,13 @@ export default function Studio() {
           >
             {[
               ["all", "Everyone"],
-              ["roleplay", "Practice partners"],
+              ["roleplay", "Practice"],
               ["assistant", "Assistants"],
             ].map(([value, label]) => (
               <button
                 key={value}
-                className={kindFilter === value ? "selected" : ""}
                 aria-pressed={kindFilter === value}
+                className={kindFilter === value ? "selected" : ""}
                 onClick={() => setKindFilter(value)}
               >
                 {label}
@@ -941,32 +839,24 @@ export default function Studio() {
           </div>
           <Link href="/new" className="btn primary">
             <Plus size={15} />
-            Someone new
+            Create new
           </Link>
         </div>
       )}
       {loading ? (
-        <div
-          className="character-skeletons"
-          aria-label="Loading your characters"
-        >
+        <div className="character-skeletons" aria-label="Loading characters">
           {[0, 1, 2].map((i) => (
             <div key={i} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="panel empty">
-          <Coffee size={26} />
+          <MessageCircle size={30} />
           <h3>
             {agents.length
-              ? "No one by that name here."
-              : "A fresh studio. A good place to start."}
+              ? "No matches. Try another name."
+              : "Your crew starts here."}
           </h3>
-          <p>
-            {agents.length
-              ? "Try another name or change the filter."
-              : "Choose a starting point above, or describe someone you’d like to talk to."}
-          </p>
           {agents.length > 0 && (
             <button
               className="btn"
@@ -985,50 +875,147 @@ export default function Studio() {
             <Link
               key={a.id}
               href={`/agents/${a.id}/test`}
-              className="card agentcard human-agent"
+              className="card agentcard playful-agent"
             >
-              <div className="flex" style={{ justifyContent: "space-between" }}>
-                <div className={`small-portrait small-portrait-${i % 3}`}>
-                  {a.name.split(" · ")[0].slice(0, 2)}
-                </div>
-                <span className="agent-kind">
+              <div
+                className={`agent-face-strip ${["peach", "lilac", "mint"][i % 3]}`}
+              >
+                <CharacterFace variant={i % 3} />
+                <span>
                   {a.config.kind === "roleplay"
                     ? "Practice partner"
-                    : "Helpful assistant"}
+                    : "Assistant"}
                 </span>
               </div>
-              <h3>
-                {a.name.split(" · ")[0]}
-                <ArrowUpRight size={17} />
-              </h3>
-              <span className="character-subtitle">
-                {a.name.split(" · ")[1] || a.config.kind}
-              </span>
-              <p className="character-quote">
-                “{a.config.welcome_message.slice(0, 120)}
-                {a.config.welcome_message.length > 120 ? "…" : ""}”
-              </p>
-              <div className="cardfooter">
-                <span>
-                  {a._count?.sessions
-                    ? `${a._count.sessions} conversation${a._count.sessions === 1 ? "" : "s"} together`
-                    : "Your first conversation is waiting"}
-                </span>
-                <span className="agent-availability">
-                  <span className="status-dot" />
-                  {a.remoteId ? "Voice ready" : "Demo"}
-                </span>
+              <div className="agent-info">
+                <h3>
+                  {a.name.split(" · ")[0]}
+                  <ArrowUpRight size={17} />
+                </h3>
+                <small>
+                  {a.name.split(" · ")[1] || "Your voice character"}
+                </small>
+                <p>
+                  “{a.config.welcome_message.slice(0, 90)}
+                  {a.config.welcome_message.length > 90 ? "…" : ""}”
+                </p>
+                <div className="cardfooter">
+                  <span>
+                    {a._count?.sessions
+                      ? `${a._count.sessions} ${a._count.sessions === 1 ? "chat" : "chats"}`
+                      : "Say hello"}
+                  </span>
+                  <span>
+                    <span className="status-dot" />
+                    {a.remoteId ? "Voice ready" : "Demo"}
+                  </span>
+                </div>
               </div>
             </Link>
           ))}
         </div>
       )}
       <div className="footer">
-        <span>
-          <Heart size={12} />A little practice goes a long way.
-        </span>
-        <span>Your pace. Your words. Your rehearsal.</span>
+        <span>Made for a little trial & error.</span>
+        <span>Powered by ElevenLabs</span>
       </div>
     </Shell>
+  );
+}
+function CharacterFace({ variant = 0 }: { variant?: number }) {
+  return (
+    <svg
+      className={`character-face face-${variant}`}
+      viewBox="0 0 220 150"
+      fill="none"
+      aria-hidden="true"
+    >
+      <ellipse
+        cx="111"
+        cy="139"
+        rx="65"
+        ry="7"
+        fill="currentColor"
+        opacity=".09"
+      />
+      {variant === 0 ? (
+        <>
+          <path
+            d="M58 80C41 30 81 13 107 27C139 3 185 38 165 79C194 122 148 144 112 129C72 150 31 119 58 80Z"
+            fill="#F7A96E"
+          />
+          <path
+            d="M80 72L94 78L80 83M141 72L127 78L141 83"
+            stroke="#322849"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M96 103Q111 93 126 103"
+            stroke="#322849"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+          <ellipse cx="72" cy="94" rx="10" ry="5" fill="#ED7B59" />
+          <ellipse cx="149" cy="94" rx="10" ry="5" fill="#ED7B59" />
+        </>
+      ) : variant === 1 ? (
+        <>
+          <rect
+            x="53"
+            y="27"
+            width="116"
+            height="108"
+            rx="37"
+            transform="rotate(-8 53 27)"
+            fill="#9A77DC"
+          />
+          <path
+            d="M75 64L92 69M126 65L143 60"
+            stroke="#322849"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <circle cx="86" cy="81" r="5" fill="#322849" />
+          <circle cx="134" cy="78" r="5" fill="#322849" />
+          <path
+            d="M99 109L122 105"
+            stroke="#322849"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <path d="M50 40L58 20L69 36M156 30L168 16L175 37" fill="#B99AEF" />
+        </>
+      ) : (
+        <>
+          <path
+            d="M61 129C32 95 55 55 79 54C68 18 119 5 136 39C174 23 200 73 169 94C184 129 137 152 113 130C93 144 71 141 61 129Z"
+            fill="#72BA9B"
+          />
+          <circle cx="87" cy="78" r="17" stroke="#283C3B" strokeWidth="4" />
+          <circle cx="137" cy="78" r="17" stroke="#283C3B" strokeWidth="4" />
+          <path
+            d="M104 78H120M69 73L53 69M155 73L170 68"
+            stroke="#283C3B"
+            strokeWidth="4"
+          />
+          <circle cx="88" cy="78" r="4" fill="#283C3B" />
+          <circle cx="136" cy="78" r="4" fill="#283C3B" />
+          <path
+            d="M102 107Q112 117 125 105"
+            stroke="#283C3B"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+      <path
+        className="face-star"
+        d="M191 26L194 35L203 38L194 41L191 50L188 41L179 38L188 35Z"
+        fill="currentColor"
+      />
+      <circle cx="28" cy="100" r="4" fill="currentColor" opacity=".3" />
+    </svg>
   );
 }

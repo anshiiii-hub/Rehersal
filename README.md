@@ -1,6 +1,6 @@
 # Rehearsal
 
-A local hackathon voice-agent studio: **write → test → refine → deploy → observe**. Next.js App Router, strict TypeScript, Tailwind, Prisma/SQLite, Zod, Anthropic and ElevenLabs. A personal rehearsal notebook with warm paper, forest green, and an optional evening theme.
+A local hackathon voice-agent studio: **write → test → refine → deploy → observe**. Next.js App Router, strict TypeScript, Tailwind, Prisma/SQLite, Zod, Anthropic and ElevenLabs. A playful character studio with colorful animated character cards, a compact prompt builder, and an optional dark theme.
 
 ## Run
 
@@ -22,7 +22,7 @@ Without keys, the compiler uses explicitly disclosed local starter templates, se
 
 ## Personal touches
 
-Use the profile button to set your name, studio name and daylight/evening theme. These preferences, unfinished builder drafts, and reflection notes are stored only in this browser. The builder includes scenario choices, a live character summary, challenge settings that are saved into the generated configuration, and contextual writing help. The practice console offers optional opening ideas; the journal and session pages let you keep private reflection notes.
+Use the profile button to set your name, studio name and light/dark theme. These preferences, unfinished builder drafts, and reflection notes are stored only in this browser. The builder includes scenario choices, animated character choices, challenge settings that are saved into the generated configuration, and contextual writing help. The practice console offers optional opening ideas; the journal and session pages let you keep private reflection notes.
 
 ## Configuration
 
