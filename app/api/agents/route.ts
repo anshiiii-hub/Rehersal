@@ -1,4 +1,48 @@
-import {NextRequest,NextResponse} from 'next/server';
-import {z} from 'zod';import {db} from '@/lib/db';import {admin,failure} from '@/lib/http';import {compile} from '@/lib/llm';import {createAgent} from '@/lib/elevenlabs';
-export async function GET(req:NextRequest){try{admin(req);const agents=await db.agent.findMany({orderBy:{createdAt:'desc'},include:{_count:{select:{sessions:true}}}});return NextResponse.json({agents:agents.map(a=>({...a,config:JSON.parse(a.config)})),live:!!process.env.ELEVENLABS_API_KEY,llm:!!process.env.ANTHROPIC_API_KEY});}catch(e){return failure(e)}}
-export async function POST(req:NextRequest){try{admin(req);const {prompt,language}=z.object({prompt:z.string().min(10).max(1000),language:z.enum(['en','hi']).default('en')}).parse(await req.json());const config=await compile(prompt,language);const remote=process.env.ELEVENLABS_API_KEY?await createAgent(config):null;const agent=await db.agent.create({data:{name:config.name,config:JSON.stringify(config),remoteId:remote?.agent_id,versions:{create:{config:JSON.stringify(config)}}}});return NextResponse.json({id:agent.id},{status:201});}catch(e){return failure(e)}}
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { admin, failure } from "@/lib/http";
+import { compile } from "@/lib/llm";
+import { createAgent } from "@/lib/elevenlabs";
+export async function GET(req: NextRequest) {
+  try {
+    admin(req);
+    const agents = await db.agent.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { sessions: true } } },
+    });
+    return NextResponse.json({
+      agents: agents.map((a) => ({ ...a, config: JSON.parse(a.config) })),
+      live: !!process.env.ELEVENLABS_API_KEY,
+      llm: !!process.env.ANTHROPIC_API_KEY,
+    });
+  } catch (e) {
+    return failure(e);
+  }
+}
+export async function POST(req: NextRequest) {
+  try {
+    admin(req);
+    const { prompt, language } = z
+      .object({
+        prompt: z.string().min(10).max(1000),
+        language: z.enum(["en", "hi"]).default("en"),
+      })
+      .parse(await req.json());
+    const config = await compile(prompt, language);
+    const remote = process.env.ELEVENLABS_API_KEY
+      ? await createAgent(config)
+      : null;
+    const agent = await db.agent.create({
+      data: {
+        name: config.name,
+        config: JSON.stringify(config),
+        remoteId: remote?.agent_id,
+        versions: { create: { config: JSON.stringify(config) } },
+      },
+    });
+    return NextResponse.json({ id: agent.id }, { status: 201 });
+  } catch (e) {
+    return failure(e);
+  }
+}

@@ -1,1 +1,41 @@
-{"name":"rehearsal","version":"1.0.0","private":true,"scripts":{"dev":"next dev --hostname 0.0.0.0","build":"next build","start":"next start","db:push":"prisma db push","seed":"tsx prisma/seed.ts","test":"tsx --test tests/*.test.ts","typecheck":"tsc --noEmit"},"dependencies":{"next":"^15.5.0","react":"^19.1.0","react-dom":"^19.1.0","@elevenlabs/react":"latest","@prisma/client":"^6.19.0","zod":"^3.25.0","lucide-react":"^0.468.0","server-only":"^0.0.1"},"devDependencies":{"typescript":"^5.9.0","@types/node":"^22.0.0","@types/react":"^19.0.0","@types/react-dom":"^19.0.0","prisma":"^6.19.0","tsx":"^4.20.0","tailwindcss":"^4.1.0","@tailwindcss/postcss":"^4.1.0"}}
+{
+  "name": "rehearsal",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack --hostname 0.0.0.0",
+    "build": "next build --webpack",
+    "start": "next start",
+    "db:push": "prisma db push",
+    "seed": "node --env-file=.env.local --import tsx prisma/seed.ts",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write app components lib tests prisma/seed.ts docs README.md",
+    "test:smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "@elevenlabs/react": "1.19.1",
+    "@prisma/client": "^6.19.0",
+    "lucide-react": "^0.468.0",
+    "next": "^16.4.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prettier": "^3.9.10",
+    "prisma": "^6.19.0",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  },
+  "overrides": {
+    "deepmerge-ts": "^8.0.0",
+    "postcss": "^8.5.23"
+  }
+}
