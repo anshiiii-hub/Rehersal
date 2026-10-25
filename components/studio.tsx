@@ -53,6 +53,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const { preferences, update } = usePreferences();
   const [settings, setSettings] = useState(false),
     [connectionOpen, setConnectionOpen] = useState(false),
+    [connectionError, setConnectionError] = useState(""),
+    [connecting, setConnecting] = useState(false),
     [draft, setDraft] = useState(preferences),
     [token, setToken] = useState("");
   const dialog = useRef<HTMLDivElement>(null);
@@ -93,6 +95,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     };
   }, [settings, connectionOpen]);
   function openSettings(showConnection = false) {
+    setConnectionError("");
     setDraft(preferences);
     setToken(sessionStorage.getItem("rehearsal-token") || "");
     setConnectionOpen(showConnection);
@@ -246,14 +249,40 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <h2 id="personalize-title">Make it yours.</h2>
             <p className="muted">Your name. Your studio. Your style.</p>
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                update(draft);
+                const cleanToken = token.trim();
                 const changed =
-                  token !== (sessionStorage.getItem("rehearsal-token") || "");
-                sessionStorage.setItem("rehearsal-token", token);
-                setSettings(false);
-                if (changed) window.location.reload();
+                  cleanToken !==
+                  (sessionStorage.getItem("rehearsal-token") || "");
+                setConnecting(true);
+                setConnectionError("");
+                try {
+                  if (changed || connectionOpen) {
+                    const response = await fetch("/api/owner", {
+                      method: "POST",
+                      headers: cleanToken
+                        ? { Authorization: `Bearer ${cleanToken}` }
+                        : {},
+                    });
+                    if (!response.ok) {
+                      throw new Error(
+                        response.status === 401
+                          ? "That token was not accepted. Enter the owner access token configured for this deployment."
+                          : "Could not verify owner access. Please try again.",
+                      );
+                    }
+                    sessionStorage.setItem("rehearsal-token", cleanToken);
+                  }
+                  update(draft);
+                  setSettings(false);
+                  if (changed || connectionOpen) window.location.reload();
+                } catch (error) {
+                  setConnectionError((error as Error).message);
+                  setConnectionOpen(true);
+                } finally {
+                  setConnecting(false);
+                }
               }}
             >
               <label className="field">
@@ -311,12 +340,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   in this browser session.
                 </small>
               </details>
+              {connectionError && (
+                <p role="alert" className="notice error">
+                  {connectionError}
+                </p>
+              )}
               <p className="privacy-inline">
                 <LockKeyhole size={12} />
                 Your name, theme, and drafts stay in this browser.
               </p>
-              <button className="btn primary" type="submit">
-                Make it mine <Check size={15} />
+              <button
+                className="btn primary"
+                type="submit"
+                disabled={connecting}
+              >
+                {connecting
+                  ? "Checking access…"
+                  : connectionOpen
+                    ? "Connect to studio"
+                    : "Make it mine"}{" "}
+                <Check size={15} />
               </button>
             </form>
           </div>
@@ -606,7 +649,7 @@ export default function Studio() {
                   opacity: 0.9,
                 }}
               >
-                Set your Owner access token in Settings, or leave <code>ADMIN_TOKEN</code> empty in <code>.env.local</code> for local-trust mode.
+                Connect with your owner access token to open this studio.
               </span>
             )}
           </div>

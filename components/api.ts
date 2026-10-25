@@ -12,7 +12,16 @@ export async function api(path: string, method = "GET", body?: unknown) {
     body: body ? JSON.stringify(body) : undefined,
   });
   const data = await r.json();
-  if (!r.ok) throw new Error(data.error || "Request failed");
+  if (!r.ok) {
+    if (r.status === 401 && typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("rehearsal-open-settings", {
+          detail: { openConnection: true },
+        }),
+      );
+    }
+    throw new Error(data.error || "Request failed");
+  }
   return data;
 }
 export function authHeaders(): Record<string, string> {
