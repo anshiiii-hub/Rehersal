@@ -10,7 +10,7 @@ export async function POST(
   ctx: { params: Promise<{ id: string; action: string }> },
 ) {
   try {
-    admin(req);
+    await admin(req);
     const { id, action } = await ctx.params;
     const a = await db.agent.findUniqueOrThrow({ where: { id } });
     if (action === "signed-url") {

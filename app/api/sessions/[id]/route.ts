@@ -7,7 +7,7 @@ export async function GET(
   ctx: { params: Promise<{ id: string }> },
 ) {
   try {
-    admin(req);
+    await admin(req);
     const { id } = await ctx.params;
     const s = await db.session.findUniqueOrThrow({
       where: { id },
@@ -31,7 +31,7 @@ export async function DELETE(
   ctx: { params: Promise<{ id: string }> },
 ) {
   try {
-    admin(req);
+    await admin(req);
     const { id } = await ctx.params;
     const s = await db.session.findUniqueOrThrow({ where: { id } });
     if (s.remoteId) await deleteConversation(s.remoteId);

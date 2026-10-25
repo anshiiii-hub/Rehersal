@@ -9,7 +9,7 @@ import {
 } from "@/lib/elevenlabs";
 export async function GET(req: NextRequest) {
   try {
-    admin(req);
+    await admin(req);
     return NextResponse.json(await listVoices(req.nextUrl.searchParams));
   } catch (e) {
     return failure(e);
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 }
 export async function POST(req: NextRequest) {
   try {
-    admin(req);
+    await admin(req);
     const b = z
       .discriminatedUnion("action", [
         z.object({

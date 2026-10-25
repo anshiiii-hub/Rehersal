@@ -7,7 +7,7 @@ import { grade } from "@/lib/llm";
 import { configSchema, turnSchema } from "@/lib/schemas";
 export async function GET(req: NextRequest) {
   try {
-    admin(req);
+    await admin(req);
     return NextResponse.json(
       await db.session.findMany({
         orderBy: { createdAt: "desc" },
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       })
       .parse(await req.json());
     const a = await db.agent.findUniqueOrThrow({ where: { id: body.agentId } });
-    if (!a.published) admin(req);
+    if (!a.published) await admin(req);
     let transcript = body.transcript || [],
       duration = body.duration,
       provider = null;
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       });
       if (existing) return NextResponse.json(existing);
     } else {
-      admin(req);
+      await admin(req);
       if (!body.simulated)
         throw new Error(
           "Real sessions require a verified ElevenLabs conversation ID.",

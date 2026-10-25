@@ -104,7 +104,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     setConnectionError("");
     setDraft(preferences);
     setToken(sessionStorage.getItem("rehearsal-token") || "");
-    setConnectionOpen(showConnection);
+    setConnectionOpen(user ? false : showConnection);
     setSettings(true);
   }
   useEffect(() => {
@@ -115,7 +115,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     window.addEventListener("rehearsal-open-settings", handleOpen);
     return () =>
       window.removeEventListener("rehearsal-open-settings", handleOpen);
-  }, [preferences]);
+  }, [preferences, user]);
   const initial = user?.name
     ? user.name[0].toUpperCase()
     : preferences.name
@@ -394,7 +394,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             ) : (
               <div
                 style={{
-                  padding: "10px 14px",
+                  padding: "12px 14px",
                   borderRadius: "10px",
                   background:
                     "linear-gradient(135deg, rgba(119,83,222,0.08), rgba(239,136,108,0.08))",
@@ -407,22 +407,35 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 }}
               >
                 <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
-                  <strong>Sync across devices</strong>
+                  <strong>No owner token?</strong>
                   <div style={{ color: "var(--muted)", fontSize: "11px" }}>
-                    Sign in to protect your rehearsal agents.
+                    Sign in or create a free account to enter the studio.
                   </div>
                 </div>
-                <Link
-                  href="/login"
-                  className="btn primary"
-                  style={{
-                    padding: "5px 12px",
-                    fontSize: "11px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Sign In ↗
-                </Link>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <Link
+                    href="/login"
+                    className="btn"
+                    style={{
+                      padding: "5px 10px",
+                      fontSize: "11px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="btn primary"
+                    style={{
+                      padding: "5px 10px",
+                      fontSize: "11px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Register
+                  </Link>
+                </div>
               </div>
             )}
             <form
@@ -435,7 +448,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 setConnecting(true);
                 setConnectionError("");
                 try {
-                  if (changed || connectionOpen) {
+                  if (changed || cleanToken || (connectionOpen && !user)) {
                     const response = await fetch("/api/owner", {
                       method: "POST",
                       headers: cleanToken
@@ -445,7 +458,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
                     if (!response.ok) {
                       throw new Error(
                         response.status === 401
-                          ? "That token was not accepted. Enter the owner access token configured for this deployment."
+                          ? user
+                            ? "Session expired. Please sign in again or check your owner token."
+                            : "Owner access required. Please sign in, register, or enter a valid owner token."
                           : "Could not verify owner access. Please try again.",
                       );
                     }
@@ -453,7 +468,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   }
                   update(draft);
                   setSettings(false);
-                  if (changed || connectionOpen) window.location.reload();
+                  if (changed || (connectionOpen && !user)) window.location.reload();
                 } catch (error) {
                   setConnectionError((error as Error).message);
                   setConnectionOpen(true);
@@ -502,19 +517,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 open={connectionOpen}
                 onToggle={(e) => setConnectionOpen(e.currentTarget.open)}
               >
-                <summary>Owner connection settings</summary>
+                <summary>Owner connection settings {user && "(Unlocked)"}</summary>
+                {user ? (
+                  <p style={{ fontSize: "11px", color: "var(--violet)", margin: "6px 0 10px" }}>
+                    ✓ Studio unlocked for <strong>{user.email}</strong>. Owner token is not needed.
+                  </p>
+                ) : null}
                 <label className="field">
                   <span>Owner access token</span>
                   <input
                     type="password"
                     autoComplete="off"
                     value={token}
+                    placeholder={user ? "Optional master override" : "Enter owner token"}
                     onChange={(e) => setToken(e.target.value)}
                   />
                 </label>
                 <small>
-                  Only needed if your server has an owner token configured. Kept
-                  in this browser session.
+                  {user
+                    ? "Your account already has full studio access. Kept in this browser session."
+                    : "Only needed if your server has an owner token configured and you do not have an account."}
                 </small>
               </details>
               {connectionError && (
@@ -533,9 +555,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
               >
                 {connecting
                   ? "Checking access…"
-                  : connectionOpen
-                    ? "Connect to studio"
-                    : "Make it mine"}{" "}
+                  : user
+                    ? "Save and continue"
+                    : connectionOpen
+                      ? "Connect to studio"
+                      : "Make it mine"}{" "}
                 <Check size={15} />
               </button>
             </form>
@@ -817,30 +841,43 @@ export default function Studio() {
                   opacity: 0.9,
                 }}
               >
-                Connect with your owner access token to open this studio.
+                Sign in to your account, or connect with your owner access token to open this studio.
               </span>
             )}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {error.includes("Owner access required") && (
-              <button
-                type="button"
-                className="btn secondary"
-                style={{
-                  padding: "4px 10px",
-                  fontSize: "0.82rem",
-                  cursor: "pointer",
-                }}
-                onClick={() =>
-                  window.dispatchEvent(
-                    new CustomEvent("rehearsal-open-settings", {
-                      detail: { openConnection: true },
-                    }),
-                  )
-                }
-              >
-                Enter Token
-              </button>
+              <>
+                <Link
+                  href="/login"
+                  className="btn primary"
+                  style={{
+                    padding: "4px 10px",
+                    fontSize: "0.82rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Sign In
+                </Link>
+                <button
+                  type="button"
+                  className="btn secondary"
+                  style={{
+                    padding: "4px 10px",
+                    fontSize: "0.82rem",
+                    cursor: "pointer",
+                  }}
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent("rehearsal-open-settings", {
+                        detail: { openConnection: true },
+                      }),
+                    )
+                  }
+                >
+                  Enter Token
+                </button>
+              </>
             )}
             <button onClick={() => setError("")} aria-label="Dismiss error">
               <X size={16} />

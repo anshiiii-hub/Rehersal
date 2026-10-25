@@ -6,7 +6,7 @@ import { updateAgent, deleteAgent, createAgent } from "@/lib/elevenlabs";
 type Context = { params: Promise<{ id: string }> };
 export async function GET(req: NextRequest, ctx: Context) {
   try {
-    admin(req);
+    await admin(req);
     const { id } = await ctx.params;
     const a = await db.agent.findUniqueOrThrow({
       where: { id },
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, ctx: Context) {
 }
 export async function PUT(req: NextRequest, ctx: Context) {
   try {
-    admin(req);
+    await admin(req);
     const { id } = await ctx.params;
     const c = configSchema.parse(await req.json());
     const a = await db.agent.findUniqueOrThrow({ where: { id } });
@@ -47,7 +47,7 @@ export async function PUT(req: NextRequest, ctx: Context) {
 }
 export async function DELETE(req: NextRequest, ctx: Context) {
   try {
-    admin(req);
+    await admin(req);
     const { id } = await ctx.params;
     const a = await db.agent.findUniqueOrThrow({ where: { id } });
     if (a.remoteId) await deleteAgent(a.remoteId);

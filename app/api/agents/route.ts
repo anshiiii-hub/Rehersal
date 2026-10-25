@@ -6,7 +6,7 @@ import { compile, hasLlm } from "@/lib/llm";
 import { createAgent } from "@/lib/elevenlabs";
 export async function GET(req: NextRequest) {
   try {
-    admin(req);
+    await admin(req);
     const agents = await db.agent.findMany({
       orderBy: { createdAt: "desc" },
       include: { _count: { select: { sessions: true } } },
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 }
 export async function POST(req: NextRequest) {
   try {
-    admin(req);
+    const user = await admin(req);
     const { prompt, language, difficulty, kind } = z
       .object({
         prompt: z.string().min(10).max(1000),
@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
         name: config.name,
         config: JSON.stringify(config),
         remoteId: remote?.agent_id,
+        userId: user?.id || null,
         versions: { create: { config: JSON.stringify(config) } },
       },
     });

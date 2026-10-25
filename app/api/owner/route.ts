@@ -3,7 +3,7 @@ import { admin, failure } from "@/lib/http";
 
 export async function POST(req: NextRequest) {
   try {
-    admin(req);
+    await admin(req);
     return NextResponse.json(
       { ok: true },
       { headers: { "Cache-Control": "no-store" } },

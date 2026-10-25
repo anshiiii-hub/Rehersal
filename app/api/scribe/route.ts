@@ -3,7 +3,7 @@ import { admin, failure } from "@/lib/http";
 import { transcribe } from "@/lib/elevenlabs";
 export async function POST(req: NextRequest) {
   try {
-    admin(req);
+    await admin(req);
     const file = (await req.formData()).get("file");
     if (
       !(file instanceof File) ||
