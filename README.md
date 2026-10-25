@@ -1,6 +1,6 @@
 # Rehearsal
 
-A local hackathon voice-agent studio: **write → test → refine → deploy → observe**. Next.js App Router, strict TypeScript, Tailwind, Prisma/SQLite, Zod, Anthropic and ElevenLabs. A playful character studio with colorful animated character cards, a compact prompt builder, and an optional dark theme.
+A hackathon voice-agent studio: **write → test → refine → deploy → observe**. Next.js App Router, strict TypeScript, Tailwind, Prisma/PostgreSQL, Zod, Anthropic and ElevenLabs. A playful character studio with colorful animated character cards, a compact prompt builder, and an optional dark theme.
 
 ## Run
 
@@ -9,9 +9,10 @@ Node 22+ recommended.
 ```sh
 npm install
 cp .env.example .env.local
+# Set DATABASE_URL and DIRECT_URL for your PostgreSQL database.
 # Add keys to .env.local for live voice and AI compilation.
 npx prisma generate
-DATABASE_URL="file:./dev.db" npm run db:push
+npm run db:push
 node --env-file=.env.local --import tsx prisma/seed.ts
 npm run dev
 ```
@@ -29,7 +30,8 @@ Use the profile button to set your name, studio name and light/dark theme. These
 - `ELEVENLABS_API_KEY`: server only; needs agent, conversation, voice, TTS and Scribe permissions and available credits.
 - `ANTHROPIC_API_KEY`: server only, required for actual prompt compilation, chat refinement and evidence-based grading.
 - `ANTHROPIC_MODEL`: configurable model ID; default `claude-sonnet-4-6`. Availability depends on your account; select an available model if rejected.
-- `DATABASE_URL`: default `file:./dev.db` (relative to Prisma schema). For Postgres, change Prisma provider to `postgresql`, supply URL, and migrate. JSON records are stored as strings for portability.
+- `DATABASE_URL`: required PostgreSQL runtime connection URL. For Supabase on Vercel, use the transaction pooler URL with `pgbouncer=true` as shown in `.env.example`. JSON records are stored as strings.
+- `DIRECT_URL`: PostgreSQL direct or session pooler connection URL for Prisma schema commands. Configure both database variables in Vercel's Production environment.
 - `ADMIN_TOKEN`: **required in production**. Set an unguessable token and enter it via Owner settings in the sidebar. Never distribute the owner token to students. Development without a token is local-trust mode.
 
 Do not commit `.env.local` or the SQLite file. All provider calls execute in route handlers/server modules. The official browser SDK alone handles media using a server-issued signed URL. Run locally for the hackathon; public signed-link endpoints have no per-student quota, authentication or billing protection, so this is not hardened for internet-wide use.
@@ -40,7 +42,7 @@ Do not commit `.env.local` or the SQLite file. All provider calls execute in rou
 flowchart LR
   Teacher[Teacher studio] --> API[Next.js route handlers + Zod]
   Student[Public practice page] --> Public[Restricted public routes]
-  API --> DB[(Prisma / SQLite)]
+  API --> DB[(Prisma / PostgreSQL)]
   API --> Claude[Anthropic compiler / patch / grader]
   API --> EL[lib/elevenlabs]
   Public --> EL
