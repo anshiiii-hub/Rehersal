@@ -6,7 +6,7 @@
     "dev": "next dev --webpack --hostname 0.0.0.0",
     "build": "next build --webpack",
     "start": "next start",
-    "db:push": "prisma db push",
+    "db:push": "node --env-file=.env.local ./node_modules/prisma/build/index.js db push",
     "seed": "node --env-file=.env.local --import tsx prisma/seed.ts",
     "test": "node --import tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",

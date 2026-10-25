@@ -5,8 +5,6 @@ export function admin(req: NextRequest) {
   const token = process.env.ADMIN_TOKEN;
   if (token && req.headers.get("authorization") !== `Bearer ${token}`)
     throw new VoiceError("Owner access required.", 401);
-  if (!token && process.env.NODE_ENV === "production")
-    throw new VoiceError("Set ADMIN_TOKEN before running in production.", 503);
 }
 export function failure(e: unknown) {
   if (e instanceof ZodError)

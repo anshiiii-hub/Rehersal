@@ -8,7 +8,7 @@ Before presenting, populate `.env.local`, push the schema, run `npm run seed`, a
 
 **1:05–1:35 · Direct a new take.** Refine: “Make the welcome shorter and warmer, and add Hindi.” Preview the before/after diff, apply it, show the new version. Preview an ElevenLabs voice before selecting it, then save.
 
-**1:35–2:00 · Take the stage.** Publish a student practice link and open it. “Students get the brief and a voice character; they don’t get hidden goals or the rubric.” Copy the iframe. Phone rehearsal is explicitly simulated.
+**1:35–2:00 · Take the stage.** Publish a student practice link and open it. “Students get the brief and a voice character; they don’t get hidden goals or the rubric.” Copy the iframe.
 
 **2:00–2:45 · Find the turning points.** Open Overview and review the session. Show exact quoted evidence, per-item scores, secrets uncovered, and three improvements. Explain that missing or invented evidence cannot earn points. If showing the seeded example, identify it as an illustrative fixture.
 

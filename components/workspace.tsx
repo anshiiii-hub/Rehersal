@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  ArrowRight,
   Save,
   Copy,
   Plus,
@@ -862,17 +861,6 @@ export default function Workspace({
             </div>
           </div>
           <div>
-            <div className="panel">
-              <h3>Phone rehearsal</h3>
-              <span className="badge">SIMULATED · NO PHONE CALLS</span>
-              <p className="muted">
-                Practice the flow in the browser. This demo does not dial a
-                phone number. Native Twilio calling is not configured.
-              </p>
-              <Link className="btn" href={`/agents/${id}/test`}>
-                Open browser rehearsal <ArrowRight size={14} />
-              </Link>
-            </div>
             <div className="panel">
               <h3>Before you take the stage</h3>
               <p className="muted">

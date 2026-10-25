@@ -52,13 +52,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { preferences, update } = usePreferences();
   const [settings, setSettings] = useState(false),
+    [connectionOpen, setConnectionOpen] = useState(false),
     [draft, setDraft] = useState(preferences),
     [token, setToken] = useState("");
   const dialog = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!settings) return;
     const previous = document.activeElement as HTMLElement | null;
-    dialog.current?.querySelector<HTMLInputElement>("input")?.focus();
+    if (connectionOpen) {
+      dialog.current
+        ?.querySelector<HTMLInputElement>(
+          ".connection-settings input[type='password']",
+        )
+        ?.focus();
+    } else {
+      dialog.current?.querySelector<HTMLInputElement>("input")?.focus();
+    }
     const close = (e: KeyboardEvent) => {
       if (e.key === "Escape") setSettings(false);
       if (e.key === "Tab") {
@@ -82,12 +91,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
       document.removeEventListener("keydown", close);
       previous?.focus();
     };
-  }, [settings]);
-  function openSettings() {
+  }, [settings, connectionOpen]);
+  function openSettings(showConnection = false) {
     setDraft(preferences);
     setToken(sessionStorage.getItem("rehearsal-token") || "");
+    setConnectionOpen(showConnection);
     setSettings(true);
   }
+  useEffect(() => {
+    const handleOpen = (e: Event) => {
+      const customEvent = e as CustomEvent<{ openConnection?: boolean }>;
+      openSettings(customEvent.detail?.openConnection ?? false);
+    };
+    window.addEventListener("rehearsal-open-settings", handleOpen);
+    return () =>
+      window.removeEventListener("rehearsal-open-settings", handleOpen);
+  }, [preferences]);
   const initial = preferences.name ? preferences.name[0].toUpperCase() : "R";
   return (
     <div className="shell">
@@ -96,7 +115,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <AudioLines size={29} />
           rehearsal<span className="coral">.</span>
         </Link>
-        <button className="workspace" onClick={openSettings}>
+        <button className="workspace" onClick={() => openSettings()}>
           <span className="avatar">{initial}</span>
           <span className="workspace-copy">
             {preferences.workspace}
@@ -163,7 +182,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               ? "Switch to evening mode"
               : "Switch to daylight"}
           </button>
-          <button className="profile" onClick={openSettings}>
+          <button className="profile" onClick={() => openSettings()}>
             <span className="avatar">{initial}</span>
             <span>
               {preferences.name || "Your profile"}
@@ -194,7 +213,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </span>
           <button
             className="top-profile"
-            onClick={openSettings}
+            onClick={() => openSettings()}
             aria-label="Personalize your studio"
           >
             <span className="avatar">{initial}</span>
@@ -272,7 +291,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
                   <option value="night">Evening · soft charcoal</option>
                 </select>
               </label>
-              <details className="connection-settings">
+              <details
+                className="connection-settings"
+                open={connectionOpen}
+                onToggle={(e) => setConnectionOpen(e.currentTarget.open)}
+              >
                 <summary>Owner connection settings</summary>
                 <label className="field">
                   <span>Owner access token</span>
@@ -561,11 +584,57 @@ export default function Studio() {
         </div>
       </div>
       {error && (
-        <div className="notice error" role="alert">
-          {error}
-          <button onClick={() => setError("")} aria-label="Dismiss error">
-            <X size={16} />
-          </button>
+        <div
+          className="notice error"
+          role="alert"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "10px",
+          }}
+        >
+          <div>
+            <span>{error}</span>
+            {error.includes("Owner access required") && (
+              <span
+                style={{
+                  display: "block",
+                  fontSize: "0.85em",
+                  marginTop: "3px",
+                  opacity: 0.9,
+                }}
+              >
+                Set your Owner access token in Settings, or leave <code>ADMIN_TOKEN</code> empty in <code>.env.local</code> for local-trust mode.
+              </span>
+            )}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {error.includes("Owner access required") && (
+              <button
+                type="button"
+                className="btn secondary"
+                style={{
+                  padding: "4px 10px",
+                  fontSize: "0.82rem",
+                  cursor: "pointer",
+                }}
+                onClick={() =>
+                  window.dispatchEvent(
+                    new CustomEvent("rehearsal-open-settings", {
+                      detail: { openConnection: true },
+                    }),
+                  )
+                }
+              >
+                Enter Token
+              </button>
+            )}
+            <button onClick={() => setError("")} aria-label="Dismiss error">
+              <X size={16} />
+            </button>
+          </div>
         </div>
       )}
       {!listing && (
