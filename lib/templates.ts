@@ -1,7 +1,6 @@
 import { Config } from "./schemas";
 export const starters = [
   {
-    icon: "✦",
     title: "Role-play Trainer",
     description: "Characters that challenge. Practice that sticks.",
     prompt:
@@ -9,7 +8,6 @@ export const starters = [
     kind: "roleplay",
   },
   {
-    icon: "◈",
     title: "Lead Generation",
     description: "Turn a little interest into a real conversation.",
     prompt:
@@ -17,7 +15,6 @@ export const starters = [
     kind: "assistant",
   },
   {
-    icon: "◷",
     title: "Appointments",
     description: "A warm welcome. A full calendar.",
     prompt:
@@ -25,14 +22,12 @@ export const starters = [
     kind: "assistant",
   },
   {
-    icon: "♡",
     title: "Support",
     description: "Patient answers, even on difficult days.",
     prompt: "Create a calm customer support assistant for an online store.",
     kind: "assistant",
   },
   {
-    icon: "⇄",
     title: "Negotiation",
     description: "Find your voice in the tough conversations.",
     prompt:
@@ -40,7 +35,6 @@ export const starters = [
     kind: "roleplay",
   },
   {
-    icon: "◎",
     title: "Collections",
     description: "Navigate sensitive conversations with care.",
     prompt:

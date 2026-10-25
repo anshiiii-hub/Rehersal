@@ -1,37 +1,67 @@
 generator client {
- provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
 model Agent {
- id String @id @default(cuid())
- name String
- config String
- remoteId String?
- published Boolean @default(false)
- createdAt DateTime @default(now())
- versions Version[]
- sessions Session[]
+  id        String    @id @default(cuid())
+  name      String
+  config    String
+  remoteId  String?
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  versions  Version[]
+  sessions  Session[]
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
+
 model Version {
- id String @id @default(cuid())
- agentId String
- agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
- config String
- createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  config    String
+  createdAt DateTime @default(now())
 }
+
 model Session {
- id String @id @default(cuid())
- agentId String
- agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
- remoteId String? @unique
- config String @default("{}")
- transcript String
- analysis String
- duration Int @default(0)
- simulated Boolean @default(false)
- createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  remoteId  String?  @unique
+  config    String   @default("{}")
+  transcript String
+  analysis  String
+  duration  Int      @default(0)
+  simulated Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  workspace    String        @default("My rehearsal studio")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  agents       Agent[]
+  sessions     AuthSession[]
+}
+
+model AuthSession {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
 }

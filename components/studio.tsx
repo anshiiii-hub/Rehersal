@@ -35,8 +35,13 @@ import {
   Circle,
   PencilLine,
   Bookmark,
+  LogIn,
+  LogOut,
+  User as UserIcon,
 } from "lucide-react";
 import { usePreferences } from "./preferences";
+import { useAuth } from "./auth-context";
+import StudioMotion from "./studio-motion";
 import { starters } from "@/lib/templates";
 import { Config } from "@/lib/schemas";
 import { api, authHeaders } from "./api";
@@ -50,6 +55,7 @@ export type Agent = {
 };
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
+  const { user, logout } = useAuth();
   const { preferences, update } = usePreferences();
   const [settings, setSettings] = useState(false),
     [connectionOpen, setConnectionOpen] = useState(false),
@@ -110,9 +116,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
     return () =>
       window.removeEventListener("rehearsal-open-settings", handleOpen);
   }, [preferences]);
-  const initial = preferences.name ? preferences.name[0].toUpperCase() : "R";
+  const initial = user?.name
+    ? user.name[0].toUpperCase()
+    : preferences.name
+      ? preferences.name[0].toUpperCase()
+      : "R";
   return (
     <div className="shell">
+      <StudioMotion />
       <aside className="sidebar">
         <Link className="brand" href="/">
           <AudioLines size={29} />
@@ -154,6 +165,66 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <BookOpen size={17} />
             Quick start
           </Link>
+          <div className="nav-label" style={{ marginTop: "14px" }}>
+            ACCOUNT
+          </div>
+          {user ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+                padding: "4px 8px",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "11px",
+                  color: "var(--muted)",
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {user.email}
+              </span>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="btn"
+                style={{
+                  justifyContent: "flex-start",
+                  padding: "6px 10px",
+                  fontSize: "11px",
+                  gap: "6px",
+                }}
+              >
+                <LogOut size={13} />
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "4px" }}
+            >
+              <Link
+                href="/login"
+                className={path === "/login" ? "active" : ""}
+                id="sidebar-signin-link"
+              >
+                <LogIn size={16} />
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className={path === "/register" ? "active" : ""}
+                id="sidebar-register-link"
+              >
+                <UserIcon size={16} />
+                Create Account
+              </Link>
+            </div>
+          )}
         </nav>
         <div className="sidebottom">
           <div className="tip">
@@ -214,13 +285,54 @@ export function Shell({ children }: { children: React.ReactNode }) {
                       ? "Getting started"
                       : "A fresh page"}
           </span>
-          <button
-            className="top-profile"
-            onClick={() => openSettings()}
-            aria-label="Personalize your studio"
-          >
-            <span className="avatar">{initial}</span>
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {user ? (
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <button
+                  className="top-profile"
+                  onClick={() => openSettings()}
+                  aria-label="Personalize your studio"
+                  title={`Signed in as ${user.email}`}
+                >
+                  <span className="avatar">{initial}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="btn"
+                  style={{ padding: "6px 10px", fontSize: "11px", gap: "4px" }}
+                  title="Sign out"
+                >
+                  <LogOut size={13} />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <Link
+                  href="/login"
+                  className="btn"
+                  style={{ padding: "6px 12px", fontSize: "12px", gap: "6px" }}
+                  id="topbar-login-button"
+                >
+                  <LogIn size={13} />
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="btn primary"
+                  style={{ padding: "6px 12px", fontSize: "12px", gap: "6px" }}
+                  id="topbar-register-button"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
         </header>
         <div className="content">{children}</div>
       </main>
@@ -248,6 +360,71 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="eyebrow">A SPACE THAT FEELS LIKE YOU</span>
             <h2 id="personalize-title">Make it yours.</h2>
             <p className="muted">Your name. Your studio. Your style.</p>
+
+            {user ? (
+              <div
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "10px",
+                  background: "var(--soft)",
+                  border: "1px solid var(--line)",
+                  marginBottom: "16px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: "12px", fontWeight: "600" }}>
+                    Signed in as {user.name}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "var(--muted)" }}>
+                    {user.email}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="btn"
+                  style={{ padding: "5px 10px", fontSize: "11px" }}
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: "10px",
+                  background:
+                    "linear-gradient(135deg, rgba(119,83,222,0.08), rgba(239,136,108,0.08))",
+                  border: "1px dashed var(--violet)",
+                  marginBottom: "16px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
+                  <strong>Sync across devices</strong>
+                  <div style={{ color: "var(--muted)", fontSize: "11px" }}>
+                    Sign in to protect your rehearsal agents.
+                  </div>
+                </div>
+                <Link
+                  href="/login"
+                  className="btn primary"
+                  style={{
+                    padding: "5px 12px",
+                    fontSize: "11px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Sign In ↗
+                </Link>
+              </div>
+            )}
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -594,36 +771,27 @@ export default function Studio() {
         <div>
           <p className="hello-note">
             {preferences.name
-              ? `Hey ${preferences.name} 👋`
-              : "YOUR VOICE. YOUR RULES."}
+              ? `Welcome back, ${preferences.name}`
+              : "REHEARSAL STUDIO"}
           </p>
           <h1>
             {listing ? (
               <>
-                Meet your <span>crew.</span>
+                Your <span>characters.</span>
               </>
             ) : (
               <>
-                Big personalities.
+                Practice the conversation.
                 <br />
-                <span>Zero pressure.</span>
+                <span>Build your confidence.</span>
               </>
             )}
           </h1>
           <p>
             {listing
-              ? "Pick a character. Pick up the conversation."
-              : "Make a voice character. Talk it out. Try again."}
+              ? "Choose a character to continue practicing."
+              : "Create a character and rehearse at your own pace."}
           </p>
-        </div>
-        <div className="hero-sticker" aria-hidden="true">
-          <AudioLines size={35} />
-          <span>
-            LET’S
-            <br />
-            TALK!
-          </span>
-          <i>✦</i>
         </div>
       </div>
       {error && (
@@ -712,7 +880,20 @@ export default function Studio() {
           </div>
           <div className="cast-heading">
             <h2>Pick a personality</h2>
-            <small>Or dream up your own below ↓</small>
+            <button
+              className="text-button surprise-button"
+              onClick={() => {
+                const options = starters
+                  .map((starter, i) => ({ starter, i }))
+                  .filter(
+                    ({ starter, i }) => starter.kind === mode && i !== selected,
+                  );
+                if (options.length)
+                  choose(options[Math.floor(Math.random() * options.length)].i);
+              }}
+            >
+              Try an example
+            </button>
           </div>
           <div className="cast-grid">
             {cards.map((c) => (
@@ -765,11 +946,10 @@ export default function Studio() {
           >
             <div className="prompt-heading">
               <div>
-                <span className="mini-spark">✦</span>
                 <h2>
                   {selected !== null
-                    ? "Make it yours."
-                    : "Got someone else in mind?"}
+                    ? "Edit your character"
+                    : "Describe your character"}
                 </h2>
               </div>
               <span className="draft-status" aria-live="polite">
@@ -802,6 +982,24 @@ export default function Studio() {
                   : "A receptionist for my dental clinic who speaks English and Hindi…"
               }
             />
+            <div
+              className="brief-progress"
+              aria-label="Character brief checklist"
+            >
+              {[
+                ["An idea", prompt.trim().length >= 10],
+                ["Some detail", prompt.trim().length >= 60],
+                ["Ready to rehearse", prompt.trim().length >= 100],
+              ].map(([label, complete]) => (
+                <span
+                  key={String(label)}
+                  className={complete ? "complete" : ""}
+                >
+                  {complete ? <CheckCircle2 size={13} /> : <Circle size={13} />}
+                  {label}
+                </span>
+              ))}
+            </div>
             <div className="prompt-tools">
               <div className="flex">
                 <button
